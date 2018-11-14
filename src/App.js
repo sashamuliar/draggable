@@ -18,11 +18,6 @@ class App extends Component {
     // console.log(e.target)
   }
 
-  onDrop = (e) => {
-    // let data = e.dataTransfer.getData('d')
-    // e.currentTarget.appendChild(a)
-    console.log(e.currentTarget)
-  }
   dragStart = e => {
     this.setState({dragged: e.currentTarget});
     // e.target.style.boxShadow = "5px 5px 7px rgba(0,0,0,.3)";
@@ -38,19 +33,21 @@ class App extends Component {
   onDrop = e => {
     e.preventDefault();
     let el = this.state.dragged;
+    let current = this.findParent(e, 'droppableZone');
     let dragParrent = el.parentElement;
-    let dropChild = e.currentTarget.children[0];
-    this.mountNode(e.currentTarget, el)
-    this.mountNode(dragParrent, dropChild)
-    // console.log(dragParrent, 'parrent')
+    let dropChild = current.children[0];
+    this.mountNode(current, el);
+    this.mountNode(dragParrent, dropChild);
+    console.log(current, 'parrent')
     // console.log(dropChild, 'child')
-    this.hideDroppableZone(e.currentTarget);
+    this.hideDroppableZone(current);
     this.setState({dragged: undefined});
   }
 
   onDrag = e => {
     e.preventDefault();
     e.stopPropagation();
+    let el = this.findParent(e, 'droppableZone');
     // var el
     // if (e.target.className.includes('droppableZone')){
     //   el = e.target
@@ -59,14 +56,15 @@ class App extends Component {
     // }
 
 
-    this.showDroppableZone(e.currentTarget)
+    this.showDroppableZone(el);
     // console.log(e.currentTarget)
     // console.log(e.target)
   }
 
   onLeave = e => {
     e.preventDefault();
-    this.hideDroppableZone(e.currentTarget)
+    let current = this.findParent(e, 'droppableZone')
+    this.hideDroppableZone(current)
   }
 
   showDroppableZone = el => {
@@ -92,7 +90,17 @@ class App extends Component {
     while (!el.className.includes(parentClass)){
       el = el.parentElement
     }
-    console.log(el)
+    // console.log(el)
+    return el
+  }
+
+  findParent = (e, parentClass) => {
+    var el
+    if (e.target.className.includes(parentClass)){
+      el = e.target
+    } else {
+      el = this.returnParent(e.target, parentClass)
+    }
     return el
   }
 
